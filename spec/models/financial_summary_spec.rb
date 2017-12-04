@@ -1,5 +1,3 @@
-require 'rails_helper'
-
 describe FinancialSummary do
   let!(:user) { create(:user) }
 

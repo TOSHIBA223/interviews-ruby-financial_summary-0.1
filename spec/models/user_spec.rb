@@ -1,5 +1,3 @@
-require 'rails_helper'
-
 describe User do
   it 'requires a valid email' do
     expect(User.new(email: nil).valid?).to eq(false)

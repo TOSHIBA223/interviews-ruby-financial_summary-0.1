@@ -1,5 +1,3 @@
-require 'rails_helper'
-
 describe Wallet do
   subject { build(:wallet) }
 
