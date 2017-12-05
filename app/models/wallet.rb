@@ -8,7 +8,7 @@ class Wallet < ApplicationRecord
   private
 
   def support_usd_cad
-    if !%w[usd cad].include?(balance_currency.to_s.downcase)
+    unless balance_currency.to_s.downcase.in? %w[usd cad]
       errors.add(:balance_currency, 'Only support for USD, CAD currencies')
     end
   end

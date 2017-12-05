@@ -13,11 +13,11 @@ class Transaction < ApplicationRecord
 
   def action_category_match
     if action.to_sym == :credit
-      if !%w[deposit refund purchase].include?(category)
+      unless category.in? %w[deposit refund purchase]
         errors.add(:base, 'Credits must be in category deposit, refund or purchase.')
       end
     elsif action.to_sym == :debit
-      if !%w[withdraw ante].include?(category)
+      unless category.in? %w[withdraw ante]
         errors.add(:base, 'Debits must be in category withdraw or ante.')
       end
     end
