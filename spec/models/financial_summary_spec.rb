@@ -23,8 +23,6 @@ describe FinancialSummary do
              amount: Money.from_amount(5,:cad))
     end
 
-    pending('Not implemented yet')
-
     expect(subject.one_day.count(:deposit)).to eq(2)
     expect(subject.one_day.amount(:deposit)).to eq(Money.from_amount(12.12, :usd))
 
@@ -59,8 +57,6 @@ describe FinancialSummary do
              action: :credit, category: :refund,
              amount: Money.from_amount(5,:cad))
     end
-
-    pending('Not implemented yet')
 
     expect(subject.seven_days.count(:deposit)).to eq(2)
     expect(subject.seven_days.amount(:deposit)).to eq(Money.from_amount(12.12, :usd))
@@ -100,8 +96,6 @@ describe FinancialSummary do
              action: :credit, category: :refund,
              amount: Money.from_amount(13.45,:usd))
     end
-
-    pending('Not implemented yet')
 
     expect(subject.lifetime.count(:deposit)).to eq(2)
     expect(subject.lifetime.amount(:deposit)).to eq(Money.from_amount(12.12, :usd))
