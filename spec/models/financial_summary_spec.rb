@@ -77,12 +77,16 @@ describe FinancialSummary do
       create(:transaction, user: user,
              action: :credit, category: :deposit,
              amount: Money.from_amount(10,:usd))
+
+      create(:transaction, user: user,
+             action: :credit, category: :purchase,
+             amount: Money.from_amount(120,:usd))
     end
 
     Timecop.travel(Time.now - 30.days) do
       create(:transaction, user: user,
              action: :credit, category: :purchase,
-             amount: Money.from_amount(131,:usd))
+             amount: Money.from_amount(3.33,:usd))
 
       create(:transaction, user: user,
              action: :debit, category: :withdraw,
