@@ -1,7 +1,6 @@
 FactoryBot.define do
   factory :user do
     email { FFaker::Internet.safe_email }
-
   end
 
   factory :wallet do

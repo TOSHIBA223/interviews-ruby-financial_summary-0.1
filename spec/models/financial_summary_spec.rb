@@ -21,6 +21,14 @@ describe FinancialSummary do
       create(:transaction, user: user,
              action: :credit, category: :refund,
              amount: Money.from_amount(5,:cad))
+
+      create(:transaction, user: user,
+             action: :debit, category: :ante,
+             amount: Money.from_amount(3,:usd))
+
+      create(:transaction, user: user,
+             action: :debit, category: :withdraw,
+             amount: Money.from_amount(20,:cad))
     end
 
     expect(subject.one_day.count(:deposit)).to eq(2)
@@ -31,6 +39,8 @@ describe FinancialSummary do
 
     expect(subject.one_day.count(:refund)).to eq(0)
     expect(subject.one_day.amount(:refund)).to eq(Money.from_amount(0, :usd))
+
+    expect(subject.one_day.total).to eq(Money.from_amount(16.79, :usd))
   end
 
   it 'summarizes over seven days' do
@@ -42,6 +52,10 @@ describe FinancialSummary do
       create(:transaction, user: user,
              action: :credit, category: :deposit,
              amount: Money.from_amount(10,:usd))
+
+      create(:transaction, user: user,
+             action: :debit, category: :withdraw,
+             amount: Money.from_amount(7,:usd))
     end
 
     Timecop.travel(Time.now - 10.days) do
@@ -56,6 +70,10 @@ describe FinancialSummary do
       create(:transaction, user: user,
              action: :credit, category: :refund,
              amount: Money.from_amount(5,:cad))
+
+      create(:transaction, user: user,
+             action: :debit, category: :ante,
+             amount: Money.from_amount(11,:usd))
     end
 
     expect(subject.seven_days.count(:deposit)).to eq(2)
@@ -66,6 +84,8 @@ describe FinancialSummary do
 
     expect(subject.seven_days.count(:refund)).to eq(0)
     expect(subject.seven_days.amount(:refund)).to eq(Money.from_amount(0, :usd))
+
+    expect(subject.seven_days.total).to eq(Money.from_amount(5.12, :usd))
   end
 
   it 'summarizes over lifetime' do

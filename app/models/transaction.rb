@@ -1,4 +1,7 @@
 class Transaction < ApplicationRecord
+  CREDIT_CATEGORY = %w[deposit refund purchase]
+  DEBIT_CATEGORY = %w[withdraw ante]
+
   monetize :amount_cents
 
   validate :action_category_match
@@ -13,11 +16,11 @@ class Transaction < ApplicationRecord
 
   def action_category_match
     if action.to_sym == :credit
-      unless category.in? %w[deposit refund purchase]
+      unless category.in? CREDIT_CATEGORY
         errors.add(:base, 'Credits must be in category deposit, refund or purchase.')
       end
     elsif action.to_sym == :debit
-      unless category.in? %w[withdraw ante]
+      unless category.in? DEBIT_CATEGORY
         errors.add(:base, 'Debits must be in category withdraw or ante.')
       end
     end
@@ -38,5 +41,17 @@ class ActiveRecord::Relation
     self.reduce(zero) do |sum, trans|
       trans.category.to_sym == category ? sum + trans.amount : sum
     end
+  end
+
+  def total
+    sum = Money.new(0, "USD")
+    self.each do |trans|
+      if trans.category.in? Transaction::CREDIT_CATEGORY
+        sum += trans.amount
+      elsif trans.category.in? Transaction::DEBIT_CATEGORY
+        sum -= trans.amount
+      end
+    end
+    sum
   end
 end
