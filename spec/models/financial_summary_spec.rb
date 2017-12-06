@@ -31,13 +31,13 @@ describe FinancialSummary do
              amount: Money.from_amount(20,:cad))
     end
 
-    expect(subject.one_day.count(:deposit)).to eq(2)
+    expect(subject.one_day.cnt(:deposit)).to eq(2)
     expect(subject.one_day.amount(:deposit)).to eq(Money.from_amount(12.12, :usd))
 
-    expect(subject.one_day.count(:purchase)).to eq(1)
+    expect(subject.one_day.cnt(:purchase)).to eq(1)
     expect(subject.one_day.amount(:purchase)).to eq(Money.from_amount(7.67, :usd))
 
-    expect(subject.one_day.count(:refund)).to eq(0)
+    expect(subject.one_day.cnt(:refund)).to eq(0)
     expect(subject.one_day.amount(:refund)).to eq(Money.from_amount(0, :usd))
 
     expect(subject.one_day.total).to eq(Money.from_amount(16.79, :usd))
@@ -76,13 +76,13 @@ describe FinancialSummary do
              amount: Money.from_amount(11,:usd))
     end
 
-    expect(subject.seven_days.count(:deposit)).to eq(2)
+    expect(subject.seven_days.cnt(:deposit)).to eq(2)
     expect(subject.seven_days.amount(:deposit)).to eq(Money.from_amount(12.12, :usd))
 
-    expect(subject.seven_days.count(:purchase)).to eq(0)
+    expect(subject.seven_days.cnt(:purchase)).to eq(0)
     expect(subject.seven_days.amount(:purchase)).to eq(Money.from_amount(0, :usd))
 
-    expect(subject.seven_days.count(:refund)).to eq(0)
+    expect(subject.seven_days.cnt(:refund)).to eq(0)
     expect(subject.seven_days.amount(:refund)).to eq(Money.from_amount(0, :usd))
 
     expect(subject.seven_days.total).to eq(Money.from_amount(5.12, :usd))
@@ -121,16 +121,16 @@ describe FinancialSummary do
              amount: Money.from_amount(13.45,:usd))
     end
 
-    expect(subject.lifetime.count(:deposit)).to eq(2)
+    expect(subject.lifetime.cnt(:deposit)).to eq(2)
     expect(subject.lifetime.amount(:deposit)).to eq(Money.from_amount(12.12, :usd))
 
-    expect(subject.lifetime.count(:purchase)).to eq(2)
+    expect(subject.lifetime.cnt(:purchase)).to eq(2)
     expect(subject.lifetime.amount(:purchase)).to eq(Money.from_amount(123.33, :usd))
 
-    expect(subject.lifetime.count(:refund)).to eq(1)
+    expect(subject.lifetime.cnt(:refund)).to eq(1)
     expect(subject.lifetime.amount(:refund)).to eq(Money.from_amount(13.45, :usd))
 
-    expect(subject.lifetime.count(:withdraw)).to eq(1)
+    expect(subject.lifetime.cnt(:withdraw)).to eq(1)
     expect(subject.lifetime.amount(:withdraw)).to eq(Money.from_amount(7.67, :usd))
   end
 end

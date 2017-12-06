@@ -9,8 +9,49 @@ class Transaction < ApplicationRecord
 
   belongs_to :user
 
-  scope :one_day, -> { where("created_at >= ?", 1.day.ago.utc) }
-  scope :seven_days, -> { where("created_at >= ?", 1.week.ago.utc) }
+  class << self
+    def one_day
+      @t = where("created_at >= ?", 1.day.ago.utc)
+    end
+
+    def seven_days
+      @t = where("created_at >= ?", 1.week.ago.utc)
+    end
+
+    def lifetime
+      @t = where('')
+    end
+
+    def cnt(category)
+      @t.select { |trans| trans.category.to_sym == category }.size
+    end
+
+    def amount(category)
+      sum = Money.new(0, "USD")
+
+      @t.each do |trans|
+        if trans.category.to_sym == category
+          sum += trans.amount
+        end
+      end
+
+      sum
+    end
+
+    def total
+      sum = Money.new(0, "USD")
+
+      @t.each do |trans|
+        if trans.category.in? Transaction::CREDIT_CATEGORY
+          sum += trans.amount
+        elsif trans.category.in? Transaction::DEBIT_CATEGORY
+          sum -= trans.amount
+        end
+      end
+
+      sum
+    end
+  end
 
   private
 
@@ -28,30 +69,5 @@ class Transaction < ApplicationRecord
 
   def must_be_greater_than_zero
     errors.add(:amount, 'Must be greater than 0') if amount <= Money.from_amount(0, amount_currency)
-  end
-end
-
-class ActiveRecord::Relation
-  def count(category)
-    select { |trans| trans.category.to_sym == category }.size
-  end
-
-  def amount(category)
-    zero = Money.new(0, "USD")
-    self.reduce(zero) do |sum, trans|
-      trans.category.to_sym == category ? sum + trans.amount : sum
-    end
-  end
-
-  def total
-    sum = Money.new(0, "USD")
-    self.each do |trans|
-      if trans.category.in? Transaction::CREDIT_CATEGORY
-        sum += trans.amount
-      elsif trans.category.in? Transaction::DEBIT_CATEGORY
-        sum -= trans.amount
-      end
-    end
-    sum
   end
 end

@@ -13,7 +13,7 @@ class FinancialSummary
   end
 
   def lifetime
-    transactions
+    transactions.lifetime
   end
 
   private
