@@ -5,21 +5,21 @@ class FinancialSummary
   end
 
   def one_day
-    transactions.one_day
+    transactions.one_day(@currency)
   end
 
   def seven_days
-    transactions.seven_days
+    transactions.seven_days(@currency)
   end
 
   def lifetime
-    transactions.lifetime
+    transactions.lifetime(@currency)
   end
 
   private
 
   def transactions
     Transaction.where(user_id: @user_id, amount_currency: @currency)
-               .select(:amount_cents, :category)
+               .select(:amount_cents, :amount_currency, :category)
   end
 end

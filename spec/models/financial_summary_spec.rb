@@ -8,27 +8,27 @@ describe FinancialSummary do
     Timecop.freeze(Time.now) do
       create(:transaction, user: user,
              action: :credit, category: :deposit,
-             amount: Money.from_amount(2.12,:usd))
+             amount: Money.from_amount(2.12, :usd))
 
       create(:transaction, user: user,
              action: :credit, category: :deposit,
-             amount: Money.from_amount(10,:usd))
+             amount: Money.from_amount(10, :usd))
 
       create(:transaction, user: user,
              action: :credit, category: :purchase,
-             amount: Money.from_amount(7.67,:usd))
+             amount: Money.from_amount(7.67, :usd))
 
       create(:transaction, user: user,
              action: :credit, category: :refund,
-             amount: Money.from_amount(5,:cad))
+             amount: Money.from_amount(5, :cad))
 
       create(:transaction, user: user,
              action: :debit, category: :ante,
-             amount: Money.from_amount(3,:usd))
+             amount: Money.from_amount(3, :usd))
 
       create(:transaction, user: user,
              action: :debit, category: :withdraw,
-             amount: Money.from_amount(20,:cad))
+             amount: Money.from_amount(20, :cad))
     end
 
     expect(subject.one_day.cnt(:deposit)).to eq(2)
@@ -47,33 +47,33 @@ describe FinancialSummary do
     Timecop.freeze(Time.now) do
       create(:transaction, user: user,
              action: :credit, category: :deposit,
-             amount: Money.from_amount(2.12,:usd))
+             amount: Money.from_amount(2.12, :usd))
 
       create(:transaction, user: user,
              action: :credit, category: :deposit,
-             amount: Money.from_amount(10,:usd))
+             amount: Money.from_amount(10, :usd))
 
       create(:transaction, user: user,
              action: :debit, category: :withdraw,
-             amount: Money.from_amount(7,:usd))
+             amount: Money.from_amount(7, :usd))
     end
 
     Timecop.travel(Time.now - 10.days) do
       create(:transaction, user: user,
              action: :credit, category: :purchase,
-             amount: Money.from_amount(131,:usd))
+             amount: Money.from_amount(131, :usd))
 
       create(:transaction, user: user,
              action: :credit, category: :purchase,
-             amount: Money.from_amount(7.67,:usd))
+             amount: Money.from_amount(7.67, :usd))
 
       create(:transaction, user: user,
              action: :credit, category: :refund,
-             amount: Money.from_amount(5,:cad))
+             amount: Money.from_amount(5, :cad))
 
       create(:transaction, user: user,
              action: :debit, category: :ante,
-             amount: Money.from_amount(11,:usd))
+             amount: Money.from_amount(11, :usd))
     end
 
     expect(subject.seven_days.cnt(:deposit)).to eq(2)
@@ -92,33 +92,33 @@ describe FinancialSummary do
     Timecop.freeze(Time.now) do
       create(:transaction, user: user,
              action: :credit, category: :deposit,
-             amount: Money.from_amount(2.12,:usd))
+             amount: Money.from_amount(2.12, :usd))
 
       create(:transaction, user: user,
              action: :credit, category: :deposit,
-             amount: Money.from_amount(10,:usd))
+             amount: Money.from_amount(10, :usd))
 
       create(:transaction, user: user,
              action: :credit, category: :purchase,
-             amount: Money.from_amount(120,:usd))
+             amount: Money.from_amount(120, :usd))
     end
 
     Timecop.travel(Time.now - 30.days) do
       create(:transaction, user: user,
              action: :credit, category: :purchase,
-             amount: Money.from_amount(3.33,:usd))
+             amount: Money.from_amount(3.33, :usd))
 
       create(:transaction, user: user,
              action: :debit, category: :withdraw,
-             amount: Money.from_amount(7.67,:usd))
+             amount: Money.from_amount(7.67, :usd))
 
       create(:transaction, user: user,
              action: :credit, category: :refund,
-             amount: Money.from_amount(5,:cad))
+             amount: Money.from_amount(5, :cad))
 
       create(:transaction, user: user,
              action: :credit, category: :refund,
-             amount: Money.from_amount(13.45,:usd))
+             amount: Money.from_amount(13.45, :usd))
     end
 
     expect(subject.lifetime.cnt(:deposit)).to eq(2)
@@ -132,5 +132,60 @@ describe FinancialSummary do
 
     expect(subject.lifetime.cnt(:withdraw)).to eq(1)
     expect(subject.lifetime.amount(:withdraw)).to eq(Money.from_amount(7.67, :usd))
+  end
+
+  it 'works with a new currency over 7 day summary' do
+    subject = FinancialSummary.new(user_id: user.id, currency: :cad)
+
+    Timecop.freeze(Time.now) do
+      create(:transaction, user: user,
+             action: :credit, category: :deposit,
+             amount: Money.from_amount(2.12, :usd))
+
+      create(:transaction, user: user,
+             action: :credit, category: :deposit,
+             amount: Money.from_amount(8, :cad))
+
+      create(:transaction, user: user,
+             action: :credit, category: :deposit,
+             amount: Money.from_amount(10, :cad))
+
+      create(:transaction, user: user,
+             action: :debit, category: :withdraw,
+             amount: Money.from_amount(3, :cad))
+
+      create(:transaction, user: user,
+             action: :debit, category: :withdraw,
+             amount: Money.from_amount(7, :usd))
+    end
+
+    Timecop.travel(Time.now - 10.days) do
+      create(:transaction, user: user,
+             action: :credit, category: :purchase,
+             amount: Money.from_amount(131, :cad))
+
+      create(:transaction, user: user,
+             action: :credit, category: :purchase,
+             amount: Money.from_amount(7.67, :usd))
+
+      create(:transaction, user: user,
+             action: :credit, category: :refund,
+             amount: Money.from_amount(5, :cad))
+
+      create(:transaction, user: user,
+             action: :debit, category: :ante,
+             amount: Money.from_amount(11, :usd))
+    end
+
+    expect(subject.seven_days.cnt(:deposit)).to eq(2)
+    expect(subject.seven_days.amount(:deposit)).to eq(Money.from_amount(18, :cad))
+
+    expect(subject.seven_days.cnt(:purchase)).to eq(0)
+    expect(subject.seven_days.amount(:purchase)).to eq(Money.from_amount(0, :cad))
+
+    expect(subject.seven_days.cnt(:withdraw)).to eq(1)
+    expect(subject.seven_days.amount(:withdraw)).to eq(Money.from_amount(3, :cad))
+
+    expect(subject.seven_days.total).to eq(Money.from_amount(15, :cad))
   end
 end

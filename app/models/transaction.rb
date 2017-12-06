@@ -10,15 +10,18 @@ class Transaction < ApplicationRecord
   belongs_to :user
 
   class << self
-    def one_day
+    def one_day(currency)
+      @currency = currency
       @t = where("created_at >= ?", 1.day.ago.utc)
     end
 
-    def seven_days
+    def seven_days(currency)
+      @currency = currency
       @t = where("created_at >= ?", 1.week.ago.utc)
     end
 
-    def lifetime
+    def lifetime(currency)
+      @currency = currency
       @t = where('')
     end
 
@@ -27,7 +30,7 @@ class Transaction < ApplicationRecord
     end
 
     def amount(category)
-      sum = Money.new(0, "USD")
+      sum = Money.new(0, @currency)
 
       @t.each do |trans|
         if trans.category.to_sym == category
@@ -39,7 +42,7 @@ class Transaction < ApplicationRecord
     end
 
     def total
-      sum = Money.new(0, "USD")
+      sum = Money.new(0, @currency)
 
       @t.each do |trans|
         if trans.category.in? Transaction::CREDIT_CATEGORY
