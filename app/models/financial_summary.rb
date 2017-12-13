@@ -5,15 +5,15 @@ class FinancialSummary
   end
 
   def one_day
-    transactions.one_day(@currency)
+    transactions.one_day
   end
 
   def seven_days
-    transactions.seven_days(@currency)
+    transactions.seven_days
   end
 
   def lifetime
-    transactions.lifetime(@currency)
+    transactions.lifetime
   end
 
   private
